@@ -20,18 +20,25 @@ end
 function PP:OnDialogBegin(event, optionsCount)
 	self.prevText = ""
 	self.response = ""
-
+	SetDialogTitleHidden(true)
 end
 
 -- NPC continues talking.
 function PP:OnDialogUpdate(event, optionCount)
 	local name, text = GetDialogNameAndText()
 	local playerName = GetUnitName("player")
+	local npcName = GetUnitName("interact")
 
+	SetDialogTitle("Unterhaltung mit " .. npcName)
 	if self.response ~= "" and self.prevText ~= "" then
-		SetDialogText(self.prevText .. "\n\n\n" .. playerName .. ": " .. self.response .. "\n\n\n" .. text)
+		SetDialogText(npcName .. ": " .. self.prevText .. "\n\n\n"
+			.. playerName .. ": " .. self.response .. "\n\n\n"
+			.. npcName .. ": " .. text)
+
 	else
-		
+		-- begins talking
+		SetDialogText(npcName .. ": " .. text)
+
 	end
 
 	self.prevText = text
@@ -59,7 +66,7 @@ end
 
 -- NPC stopped talking.
 function PP:OnDialogEnd(event)
-	
+	SetDialogTitleHidden(false)
 end
 
 
@@ -96,6 +103,15 @@ end
 
 function SetDialogText(text)
 	ZO_InteractWindowTargetAreaBodyText:SetText(text)
+end
+
+function SetDialogTitle(title)
+	ZO_InteractWindowTargetAreaTitle:SetHorizontalAlignment(TEXT_ALIGN_LEFT)
+	ZO_InteractWindowTargetAreaTitle:SetText(title)
+end
+
+function SetDialogTitleHidden(hide)
+	ZO_InteractWindowTargetAreaTitle:SetHidden(hide)
 end
 
 -- Register event handler
