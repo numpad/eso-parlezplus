@@ -1,0 +1,6 @@
+## Title: ParlezPlus
+## APIVersion: 100027
+## AddOnVersion: 1
+## Description: Improved Dialog UI.
+
+ParlezPlus.lua
