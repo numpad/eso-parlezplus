@@ -5,72 +5,86 @@ PP.name = "ParlezPlus"
 
 -- AddOn Init
 function PP:Initialize()
-	self.inCombat = IsUnitInCombat("player")
 	self.prevText = ""
-	self.updateCount = 0
+	self.response = ""
 
-	EVENT_MANAGER:RegisterForEvent(self.name, EVENT_CHATTER_BEGIN, function (event, optionCount) self:OnDialogBegin(event, optionCount) self:OnDialogUpdate(event, optionCount) end)
-	EVENT_MANAGER:RegisterForEvent(self.name, EVENT_CHATTER_END, function (event) self:OnDialogEnd(event) end)
-	EVENT_MANAGER:RegisterForEvent(self.name, EVENT_CONVERSATION_UPDATED, function (event, optionBody, optionCount) self:OnDialogUpdate(event, optionCount) end)
+	EVENT_MANAGER:RegisterForEvent(self.name, EVENT_CHATTER_BEGIN, 			function (event) self:OnDialogBegin(event) self:OnDialogUpdate(event) end)
+	EVENT_MANAGER:RegisterForEvent(self.name, EVENT_CONVERSATION_UPDATED, 	function (event) self:OnDialogUpdate(event) end)
+	EVENT_MANAGER:RegisterForEvent(self.name, EVENT_QUEST_OFFERED, 			function (event) self:OnDialogUpdate(event) end)
+	EVENT_MANAGER:RegisterForEvent(self.name, EVENT_QUEST_COMPLETE_DIALOG, 	function (event) self:OnDialogUpdate(event) end)
+	EVENT_MANAGER:RegisterForEvent(self.name, EVENT_CHATTER_END, 			function (event) self:OnDialogEnd(event) end)
 	
 end
 
 -- NPC begins talking.
 function PP:OnDialogBegin(event, optionsCount)
 	self.prevText = ""
-	self.updateCount = 0
+	self.response = ""
 
-end
---ZO_InteractWindowPlayerAreaOptions
-
-function PP:HandleChatterOptionClicked(label)
-	if label.optionIndex and type(label.optionIndex) == "number" then
-		d("Great, OptionClicked: " .. label.optionIndex)
-	else
-		d("Great, OptionClicked: ???")
-	end
-end
-
-local ihcoc = INTERACTION.HandleChatterOptionClicked
-function INTERACTION:HandleChatterOptionClicked(label)
-	ihcoc(INTERACTION, label)
-
-	PP.HandleChatterOptionClicked(PP, label)
 end
 
 -- NPC continues talking.
 function PP:OnDialogUpdate(event, optionCount)
 	local name, text = GetDialogNameAndText()
-	self.updateCount = self.updateCount + 1
+	local playerName = GetUnitName("player")
 
-	SetDialogText(self.prevText .. "\n\n--- --- --- --- ---\n\n" .. text)
+	if self.response ~= "" and self.prevText ~= "" then
+		SetDialogText(self.prevText .. "\n\n\n" .. playerName .. ": " .. self.response .. "\n\n\n" .. text)
+	else
+		
+	end
+
 	self.prevText = text
 
-	-- iterate trough response button handles
-	local pao = ZO_InteractWindowPlayerAreaOptions;
-	for i = 1, pao:GetNumChildren() do
-		local op = pao:GetChild(i)
-		if op.optionType and op.optionType ~= 10000 then
+	--[[
+		-- iterate trough response button handles
+		local pao = ZO_InteractWindowPlayerAreaOptions;
+		for i = 1, pao:GetNumChildren() do
+			local op = pao:GetChild(i)
+			if op.optionType and op.optionType ~= 10000 then
+
+			end
+		end
+
+		-- iterate trough all options
+		for i = 1, GetChatterOptionCount() do
+			local oString, oType = GetChatterOption(i)
+
+			--d("Option " .. i .. ": " .. oType)
 
 		end
-	end
+	]]
 
-	-- iterate trough all options
-	for i = 1, GetChatterOptionCount() do
-		local oString, oType = GetChatterOption(i)
-
-		--d("Option " .. i .. ": " .. oType)
-
-	end
-	
-	--d(self.updateCount .. "| " .. name .. ": OnDialogUpdate(" .. optionCount .. ")")
 end
 
 -- NPC stopped talking.
 function PP:OnDialogEnd(event)
-	local name = GetDialogNameAndText()
-
+	
 end
+
+
+function PP:HandleChatterOptionClicked(label)
+	if label.optionIndex and type(label.optionIndex) == "number" then
+		-- d("index: " .. label.optionIndex)
+		-- d("text: " .. label.optionText)
+
+		self.response = label.optionText
+
+	end
+end
+
+-- Add additional callback handler for ChatterOptionClicked
+local ihcoc = INTERACTION.HandleChatterOptionClicked
+function INTERACTION:HandleChatterOptionClicked(label)
+	-- call base handler
+	ihcoc(INTERACTION, label)
+
+	-- call ParlezPlus handler
+	if label.enabled then
+		PP.HandleChatterOptionClicked(PP, label)
+	end
+end
+
 
 -- Helper functions
 function GetDialogNameAndText()
