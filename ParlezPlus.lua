@@ -3,11 +3,26 @@
 local PP = ZO_Object:Subclass()
 PP.name = "ParlezPlus"
 
+PP.dialog = {}
+
+function PP:clearConversation()
+	self.dialog = {}
+end
+
+function PP:addResponse(r)
+	table.insert(self.dialog, r)
+end
+
+function PP:formatConversation()
+	local text = ""
+	for i = 1, #self.dialog do
+		text = text .. self.dialog[i]:format()
+	end
+	return text
+end
+
 -- AddOn Init
 function PP:Initialize()
-	self.prevText = ""
-	self.response = ""
-
 	EVENT_MANAGER:RegisterForEvent(self.name, EVENT_CHATTER_BEGIN, 			function (event) self:OnDialogBegin(event) self:OnDialogUpdate(event) end)
 	EVENT_MANAGER:RegisterForEvent(self.name, EVENT_CONVERSATION_UPDATED, 	function (event) self:OnDialogUpdate(event) end)
 	EVENT_MANAGER:RegisterForEvent(self.name, EVENT_QUEST_OFFERED, 			function (event) self:OnDialogUpdate(event) end)
@@ -18,12 +33,9 @@ end
 
 -- NPC begins talking.
 function PP:OnDialogBegin(event, optionsCount)
-	self.prevText = ""
-	self.response = ""
 	SetDialogTitleHidden(true)
 
-	res = Response:new({person = "Chris", text = "Hello World"})
-	d(res:format())
+	self:clearConversation()
 end
 
 -- NPC continues talking.
@@ -32,21 +44,10 @@ function PP:OnDialogUpdate(event, optionCount)
 	local playerName = GetUnitName("player")
 	local npcName = GetUnitName("interact")
 
-	SetDialogTitle("Unterhaltung mit " .. npcName)
-	if self.response ~= "" and self.prevText ~= "" then
-		SetDialogText(
-			UnderlinedText(npcName, 255, 255, 255) .. ": " .. self.prevText .. "\n"
-			.. ColoredText(UnderlinedText(playerName, 255, 200, 100) .. ": " .. self.response, 255, 200, 100) .. "\n"
-			.. UnderlinedText(npcName, 255, 255, 255) .. ": " .. text)
+	self:addResponse(Response:new{person = npcName, text = text, color = TextColor.NPCText})
 
-	else
-		-- begins talking
-		SetDialogText(UnderlinedText(npcName, 255, 255, 255) .. ": " .. text)
-
-	end
-
-	self.prevText = text
-
+	SetDialogText(self:formatConversation())
+	
 	--[[
 		-- iterate trough response button handles
 		local pao = ZO_InteractWindowPlayerAreaOptions;
@@ -71,6 +72,7 @@ end
 -- NPC stopped talking.
 function PP:OnDialogEnd(event)
 	SetDialogTitleHidden(false)
+	self:clearConversation()
 end
 
 
@@ -79,7 +81,20 @@ function PP:HandleChatterOptionClicked(label)
 		-- d("index: " .. label.optionIndex)
 		-- d("text: " .. label.optionText)
 
-		self.response = label.optionText
+		local playerName = GetUnitName("player")
+		local chosenBefore = label.chosenBefore or false
+
+		if chosenBefore then
+			self:addResponse(Response:new{
+				person = playerName, text = label.optionText,
+				color = TextColor.PlayerDuplicateResponse})
+		else
+			self:addResponse(Response:new{
+				person = playerName, text = label.optionText,
+				color = TextColor.PlayerResponse})
+		end
+	elseif label.optionIndex and type(label.optionIndex) == "function" then
+		d("clicked ")
 
 	end
 end
