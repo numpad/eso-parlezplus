@@ -31,13 +31,14 @@ function PP:OnDialogUpdate(event, optionCount)
 
 	SetDialogTitle("Unterhaltung mit " .. npcName)
 	if self.response ~= "" and self.prevText ~= "" then
-		SetDialogText(npcName .. ": " .. self.prevText .. "\n\n\n"
-			.. playerName .. ": " .. self.response .. "\n\n\n"
-			.. npcName .. ": " .. text)
+		SetDialogText(
+			UnderlinedText(npcName, 255, 255, 255) .. ": " .. self.prevText .. "\n"
+			.. ColoredText(UnderlinedText(playerName, 255, 200, 100) .. ": " .. self.response, 255, 200, 100) .. "\n"
+			.. UnderlinedText(npcName, 255, 255, 255) .. ": " .. text)
 
 	else
 		-- begins talking
-		SetDialogText(npcName .. ": " .. text)
+		SetDialogText(UnderlinedText(npcName, 255, 255, 255) .. ": " .. text)
 
 	end
 
@@ -112,6 +113,29 @@ end
 
 function SetDialogTitleHidden(hide)
 	ZO_InteractWindowTargetAreaTitle:SetHidden(hide)
+end
+
+function Clamp(n, min, max)
+	return math.min(max, math.max(min, n))
+end
+
+function ColoredText(text, r, g, b)
+	r = Clamp(r, 0, 255)
+	g = Clamp(g, 0, 255)
+	b = Clamp(b, 0, 255)
+	
+	return string.format("|c%.2X%.2X%.2X%s|r", r, g, b, text)
+end
+
+function UnderlinedText(text, r, g, b)
+	solid_or_wavy = 0 -- solid(0), wavy(1)
+	thickness = 2
+
+	return string.format("|l%d:1:1:2:%d:%.2X%.2X%.2X|l%s|l",
+		solid_or_wavy,
+		thickness,
+		r, g, b,
+		text)
 end
 
 -- Register event handler
