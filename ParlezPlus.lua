@@ -23,6 +23,10 @@ end
 
 -- AddOn Init
 function PP:Initialize()
+	self.savedVars = ZO_SavedVars:NewAccountWide("ParlezPlusSavedVariables", 1, nil, {})
+	LoadSavedDefines(self.savedVars)
+
+	-- register for dialog events.
 	EVENT_MANAGER:RegisterForEvent(self.name, EVENT_CHATTER_BEGIN, 			function (event) self:OnDialogBegin(event) self:OnDialogUpdate(event) end)
 	EVENT_MANAGER:RegisterForEvent(self.name, EVENT_CONVERSATION_UPDATED, 	function (event) self:OnDialogUpdate(event) end)
 	EVENT_MANAGER:RegisterForEvent(self.name, EVENT_QUEST_OFFERED, 			function (event) self:OnDialogUpdate(event) end)
@@ -34,7 +38,7 @@ end
 -- NPC begins talking.
 function PP:OnDialogBegin(event, optionsCount)
 	SetDialogTitleHidden(true)
-
+	d(Timeout.NPCAfterResponse)
 	self:clearConversation()
 end
 
@@ -44,10 +48,31 @@ function PP:OnDialogUpdate(event, optionCount)
 	local playerName = GetUnitName("player")
 	local npcName = GetUnitName("interact")
 
-	self:addResponse(Response:new{person = npcName, text = text, color = TextColor.NPCText})
-
 	SetDialogText(self:formatConversation())
-	
+
+	-- is response by player already a duplicate?
+	if #self.dialog >= 1 and self.dialog[#self.dialog].is_duplicate then
+		self:addResponse(Response:new{
+			person = npcName, text = text,
+			color = TextColor.NPCDuplicateText,
+			is_duplicate = true})
+	else
+		self:addResponse(Response:new{
+			person = npcName, text = text,
+			color = TextColor.NPCText})
+	end
+
+	-- if its the first time talking, dont delay the npcs text.
+	local delay = Timeout.NPCAfterResponse
+	if #self.dialog <= 1 then
+		delay = 0
+	end
+
+	-- wait `delay` milliseconds until npc dialog appears after responding to him
+	setTimeout(function ()
+		SetDialogText(self:formatConversation())
+		end, delay)
+
 	--[[
 		-- iterate trough response button handles
 		local pao = ZO_InteractWindowPlayerAreaOptions;
@@ -87,7 +112,8 @@ function PP:HandleChatterOptionClicked(label)
 		if chosenBefore then
 			self:addResponse(Response:new{
 				person = playerName, text = label.optionText,
-				color = TextColor.PlayerDuplicateResponse})
+				color = TextColor.PlayerDuplicateResponse,
+				is_duplicate = true})
 		else
 			self:addResponse(Response:new{
 				person = playerName, text = label.optionText,

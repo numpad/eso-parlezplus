@@ -2,7 +2,8 @@
 Response = {
 	person = "",
 	text = "",
-	color = TextColor.NPCText
+	color = TextColor.NPCText,
+	is_duplicate = false
 }
 
 function Response:new(r)

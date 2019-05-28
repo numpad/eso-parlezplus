@@ -1,7 +1,9 @@
-## Title: ParlezPlus
 ## APIVersion: 100027
 ## AddOnVersion: 1
+## SavedVariables: ParlezPlusSavedVariables
+## Title: ParlezPlus
 ## Description: Improved Dialog UI.
+## Author: chris (@numpad0to9)
 
 Defines.lua
 Dialog.lua
