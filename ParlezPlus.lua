@@ -21,6 +21,9 @@ function PP:OnDialogBegin(event, optionsCount)
 	self.prevText = ""
 	self.response = ""
 	SetDialogTitleHidden(true)
+
+	res = Response:new({person = "Chris", text = "Hello World"})
+	d(res:format())
 end
 
 -- NPC continues talking.

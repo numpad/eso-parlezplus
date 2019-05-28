@@ -3,4 +3,5 @@
 ## AddOnVersion: 1
 ## Description: Improved Dialog UI.
 
+Dialog.lua
 ParlezPlus.lua
