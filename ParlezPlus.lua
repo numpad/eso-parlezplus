@@ -16,15 +16,16 @@ end
 function PP:formatConversation()
 	local text = ""
 	for i = 1, #self.dialog do
-		text = text .. self.dialog[i]:format()
+		if not (self.dialog[i].from_player == true and Defines.Flags.DisplayPlayerText == false) then
+			text = text .. self.dialog[i]:format()
+		end
 	end
 	return text
 end
 
 -- AddOn Init
 function PP:Initialize()
-	self.savedVars = ZO_SavedVars:NewAccountWide("ParlezPlusSavedVariables", 1, nil, {})
-	LoadSavedDefines(self.savedVars)
+	Defines:Initialize()
 
 	-- register for dialog events.
 	EVENT_MANAGER:RegisterForEvent(self.name, EVENT_CHATTER_BEGIN, 			function (event) self:OnDialogBegin(event) self:OnDialogUpdate(event) end)
@@ -38,7 +39,6 @@ end
 -- NPC begins talking.
 function PP:OnDialogBegin(event, optionsCount)
 	SetDialogTitleHidden(true)
-	d(Timeout.NPCAfterResponse)
 	self:clearConversation()
 end
 
@@ -54,17 +54,17 @@ function PP:OnDialogUpdate(event, optionCount)
 	if #self.dialog >= 1 and self.dialog[#self.dialog].is_duplicate then
 		self:addResponse(Response:new{
 			person = npcName, text = text,
-			color = TextColor.NPCDuplicateText,
+			color = Defines.TextColor.NPCDuplicateText,
 			is_duplicate = true})
 	else
 		self:addResponse(Response:new{
 			person = npcName, text = text,
-			color = TextColor.NPCText})
+			color = Defines.TextColor.NPCText})
 	end
 
 	-- if its the first time talking, dont delay the npcs text.
-	local delay = Timeout.NPCAfterResponse
-	if #self.dialog <= 1 then
+	local delay = Defines.Timeout.NPCAfterResponse
+	if #self.dialog <= 1 or Defines.Flags.DisplayPlayerText == false then
 		delay = 0
 	end
 
@@ -112,12 +112,14 @@ function PP:HandleChatterOptionClicked(label)
 		if chosenBefore then
 			self:addResponse(Response:new{
 				person = playerName, text = label.optionText,
-				color = TextColor.PlayerDuplicateResponse,
-				is_duplicate = true})
+				color = Defines.TextColor.PlayerDuplicateResponse,
+				is_duplicate = true,
+				from_player = true})
 		else
 			self:addResponse(Response:new{
 				person = playerName, text = label.optionText,
-				color = TextColor.PlayerResponse})
+				color = Defines.TextColor.PlayerResponse,
+				from_player = true})
 		end
 	elseif label.optionIndex and type(label.optionIndex) == "function" then
 		d("clicked ")
