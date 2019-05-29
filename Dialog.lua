@@ -17,13 +17,28 @@ end
 function Response:format()
 	return ColoredText(
 		self:getName()
-		.. self.text, self.color[1], self.color[2], self.color[3]) .. "\n"
+		.. self:getText(), self.color[1], self.color[2], self.color[3]) .. "\n"
+		.. self:getNewline()
+end
+
+function Response:getText()
+	return self.text
 end
 
 function Response:getOwnLine()
 	if self.from_player and Defines.Flags.PlayerNameOwnLine then
 		return "\n"
 	elseif self.from_player == false and Defines.Flags.NPCNameOwnLine then
+		return "\n"
+	end
+
+	return ""
+end
+
+function Response:getNewline()
+	if self.from_player and Defines.Flags.NewlineAfterPlayerText then
+		return "\n"
+	elseif self.from_player == false and Defines.Flags.NewlineAfterNPCText then
 		return "\n"
 	end
 

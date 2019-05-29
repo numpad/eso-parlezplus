@@ -41,7 +41,9 @@ Defines.Flags = {
 	DisplayPlayerName = true,
 	DisplayPlayerText = true,
 	PlayerNameOwnLine = false,
-	NPCNameOwnLine = false
+	NPCNameOwnLine = false,
+	NewlineAfterPlayerText = false,
+	NewlineAfterNPCText = false
 }
 
 function Defines:Initialize()
@@ -168,6 +170,22 @@ function Defines:CreateOptionsData()
 			width = "half",
 			getFunc = function () return Defines.Flags.NPCNameOwnLine end,
 			setFunc = function (v) Defines.Flags.NPCNameOwnLine = v end
+		},
+		{
+			type = "checkbox",
+			name = "Newline after player text",
+			tooltip = "Append a newline after the players response text.",
+			width = "half",
+			getFunc = function () return Defines.Flags.NewlineAfterPlayerText end,
+			setFunc = function (v) Defines.Flags.NewlineAfterPlayerText = v end
+		},
+		{
+			type = "checkbox",
+			name = "Newline after NPC text",
+			tooltip = "Append a newline after the NPCs dialog text.",
+			width = "half",
+			getFunc = function () return Defines.Flags.NewlineAfterNPCText end,
+			setFunc = function (v) Defines.Flags.NewlineAfterNPCText = v end
 		},
 		{
 			type = "checkbox",
