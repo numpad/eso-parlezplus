@@ -72,6 +72,17 @@ function PP:OnDialogUpdate(event, optionCount)
 	setTimeout(function ()
 		SetDialogText(self:formatConversation())
 		end, delay)
+	
+	if Defines.Flags.InsertResponseOptionIndex then
+		-- iterate trough response button handles and prepend its index.
+		local pao = ZO_InteractWindowPlayerAreaOptions;
+		for i = 1, pao:GetNumChildren() do
+			local op = pao:GetChild(i)
+			if op.optionType then
+				op:SetText(i .. ") " .. op:GetText())
+			end
+		end
+	end
 
 	--[[
 		-- iterate trough response button handles
@@ -129,13 +140,13 @@ function PP:HandleChatterOptionClicked(label)
 
 		if chosenBefore then
 			self:addResponse(Response:new{
-				person = playerName, text = label:GetText(),
+				person = playerName, text = label.optionText,
 				color = Defines.TextColor.PlayerDuplicateResponse,
 				is_duplicate = true,
 				from_player = true})
 		else
 			self:addResponse(Response:new{
-				person = playerName, text = label:GetText(),
+				person = playerName, text = label.optionText,
 				color = Defines.TextColor.PlayerResponse,
 				from_player = true})
 		end

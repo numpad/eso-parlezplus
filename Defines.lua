@@ -45,7 +45,8 @@ Defines.Flags = {
 	NewlineAfterPlayerText = false,
 	NewlineAfterNPCText = false,
 	DisplayDialogTitle = false,
-	DelayedNPCResponse = false
+	DelayedNPCResponse = false,
+	InsertResponseOptionIndex = false
 }
 
 Defines.FormatString = {
@@ -267,6 +268,14 @@ function Defines:CreateOptionsData()
 			isMultiline = false,
 			getFunc = function () return Defines.FormatString.NPCNameFormat end,
 			setFunc = function (v) Defines.FormatString.NPCNameFormat = v end
+		},
+		{
+			type = "checkbox",
+			name = "Show response option hotkey",
+			tooltip = "Show the numeric hotkey in front of the response text.\n"
+				.. "Default: off",
+			getFunc = function () return Defines.Flags.InsertResponseOptionIndex end,
+			setFunc = function (v) Defines.Flags.InsertResponseOptionIndex = v end
 		}
 	}
 end
