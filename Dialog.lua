@@ -48,18 +48,21 @@ end
 function Response:getName()
 
 	local display_name = nil
+	local format_string = nil
 	if self.from_player then
 		display_name = Defines.Flags.DisplayPlayerName
+		format_string = Defines.FormatString.PlayerNameFormat
 	else
 		display_name = Defines.Flags.DisplayNPCName
+		format_string = Defines.FormatString.NPCNameFormat
 	end
 
 	if not display_name then
 		return ""
 	end
 
-	return UnderlinedText(
-		self.person .. ":",
-		self.color[1], self.color[2], self.color[3])
-		.. " " .. self:getOwnLine()
+	return Defines.Format(format_string, {
+		name = self.person,
+		color = self.color})
+		.. self:getOwnLine()
 end

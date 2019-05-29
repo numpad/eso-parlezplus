@@ -97,7 +97,6 @@ end
 -- NPC stopped talking.
 function PP:OnDialogEnd(event)
 	SetDialogTitleHidden(false)
-	self:clearConversation()
 end
 
 

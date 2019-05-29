@@ -48,6 +48,37 @@ Defines.Flags = {
 	DelayedNPCResponse = false
 }
 
+Defines.FormatString = {
+	PlayerNameFormat = "{u}{{name}}:{/u} ",
+	NPCNameFormat = "{u}{{name}}:{/u} "
+}
+
+function Defines.FormatDefault(str, data)
+	local res = str
+	-- underline
+	res = string.gsub(res, "{u}", string.format("|l0:1:1:2:2:%.2X%.2X%.2X|l", UnpackColor(data.color)))
+	res = string.gsub(res, "{/u}", "|l")
+
+	return res
+end
+
+-- Formats a Defines.FormatString
+function Defines.Format(str, data)
+	-- default values
+	data.name = data.name or "NO_NAME_GIVEN"
+	data.color = data.color or Color(255, 0, 0)
+
+	-- apply standard formats such as underline, etc.
+	local res = Defines.FormatDefault(str, data)
+
+	for key, value in pairs(data) do
+		res = string.gsub(res, "{{" .. key .. "}}", value)
+	end
+
+	return res
+end
+
+
 function Defines:Initialize()
 	self.savedVars = ZO_SavedVars:NewAccountWide("ParlezPlusSavedVariables", 1, nil, {})
 
@@ -55,12 +86,14 @@ function Defines:Initialize()
 	self.savedVars.Timeout = self.savedVars.Timeout or self.Timeout
 	self.savedVars.TextColor = self.savedVars.TextColor or self.TextColor
 	self.savedVars.Flags = self.savedVars.Flags or self.Flags
+	self.savedVars.FormatString = self.savedVars.FormatString or self.FormatString
 
 	-- Load saved variables
 	self.Timeout = self.savedVars.Timeout
 	self.TextColor = self.savedVars.TextColor
 	self.Flags = self.savedVars.Flags
-
+	self.FormatString = self.savedVars.FormatString
+	
 	-- Configure AddonMenu
 	local panelData = {
 		type = "panel",
@@ -140,7 +173,8 @@ function Defines:CreateOptionsData()
 		{
 			type = "checkbox",
 			name = "Display Player name",
-			tooltip = "Display the players name before its dialog text?",
+			tooltip = "Display the players name before its dialog text?\n"
+				.. "Default: on",
 			width = "half",
 			getFunc = function () return Defines.Flags.DisplayPlayerName end,
 			setFunc = function (v) Defines.Flags.DisplayPlayerName = v end
@@ -148,7 +182,8 @@ function Defines:CreateOptionsData()
 		{
 			type = "checkbox",
 			name = "Display NPC name",
-			tooltip = "Display the NPCs name before its dialog text?",
+			tooltip = "Display the NPCs name before its dialog text?\n"
+				.. "Default: on",
 			width = "half",
 			getFunc = function () return Defines.Flags.DisplayNPCName end,
 			setFunc = function (v) Defines.Flags.DisplayNPCName = v end
@@ -156,7 +191,8 @@ function Defines:CreateOptionsData()
 		{
 			type = "checkbox",
 			name = "Player name on own line",
-			tooltip = "Display the player name on its own line, before the players response text.",
+			tooltip = "Display the player name on its own line, before the players response text.\n"
+				.. "Default: off",
 			width = "half",
 			getFunc = function () return Defines.Flags.PlayerNameOwnLine end,
 			setFunc = function (v) Defines.Flags.PlayerNameOwnLine = v end
@@ -164,7 +200,8 @@ function Defines:CreateOptionsData()
 		{
 			type = "checkbox",
 			name = "NPC name on own line",
-			tooltip = "Display the NPCs name on its own line, before the NPCs response text.",
+			tooltip = "Display the NPCs name on its own line, before the NPCs response text.\n"
+				.. "Default: off",
 			width = "half",
 			getFunc = function () return Defines.Flags.NPCNameOwnLine end,
 			setFunc = function (v) Defines.Flags.NPCNameOwnLine = v end
@@ -172,7 +209,8 @@ function Defines:CreateOptionsData()
 		{
 			type = "checkbox",
 			name = "Newline after player text",
-			tooltip = "Append a newline after the players response text.",
+			tooltip = "Append a newline after the players response text.\n"
+				.. "Default: off",
 			width = "half",
 			getFunc = function () return Defines.Flags.NewlineAfterPlayerText end,
 			setFunc = function (v) Defines.Flags.NewlineAfterPlayerText = v end
@@ -180,7 +218,8 @@ function Defines:CreateOptionsData()
 		{
 			type = "checkbox",
 			name = "Newline after NPC text",
-			tooltip = "Append a newline after the NPCs dialog text.",
+			tooltip = "Append a newline after the NPCs dialog text.\n"
+				.. "Default: off",
 			width = "half",
 			getFunc = function () return Defines.Flags.NewlineAfterNPCText end,
 			setFunc = function (v) Defines.Flags.NewlineAfterNPCText = v end
@@ -188,23 +227,46 @@ function Defines:CreateOptionsData()
 		{
 			type = "checkbox",
 			name = "Display players responses",
-			tooltip = "Show the players response?",
+			tooltip = "Show the players response?\n"
+				.. "Default: on",
 			getFunc = function () return Defines.Flags.DisplayPlayerText end,
 			setFunc = function (v) Defines.Flags.DisplayPlayerText = v end
 		},
 		{
 			type = "checkbox",
 			name = "Show dialog title",
-			tooltip = "Display the dialog title?",
+			tooltip = "Display the dialog title?\n"
+				.. "Default: off",
 			getFunc = function () return Defines.Flags.DisplayDialogTitle end,
 			setFunc = function (v) Defines.Flags.DisplayDialogTitle = v end
 		},
 		{
 			type = "checkbox",
 			name = "Delayed NPC Response",
-			tooltip = "Delay the NPCs response?\nWarning: Experimental!",
+			tooltip = "Delay closing the dialog window after giving a final response. WARNING: Experimental feature!\n"
+				.. "Default: off",
 			getFunc = function () return Defines.Flags.DelayedNPCResponse end,
 			setFunc = function (v) Defines.Flags.DelayedNPCResponse = v end
+		},
+		{
+			type = "editbox",
+			name = "Player name format string",
+			tooltip = "How the players name should be formatted in the conversation.\n"
+				.. "Default: '{u}{{name}}:{/u} '"
+				.. "Format Tags: {u}UNDERLINE{/u}, {{name}}",
+			isMultiline = false,
+			getFunc = function () return Defines.FormatString.PlayerNameFormat end,
+			setFunc = function (v) Defines.FormatString.PlayerNameFormat = v end
+		},
+		{
+			type = "editbox",
+			name = "NPC name format string",
+			tooltip = "How the NPCs name should be formatted in the conversation.\n"
+				.. "Default: '{u}{{name}}:{/u} '"
+				.. "Format Tags: {u}UNDERLINE{/u}, {{name}}",
+			isMultiline = false,
+			getFunc = function () return Defines.FormatString.NPCNameFormat end,
+			setFunc = function (v) Defines.FormatString.NPCNameFormat = v end
 		}
 	}
 end
