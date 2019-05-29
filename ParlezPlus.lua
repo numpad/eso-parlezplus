@@ -62,7 +62,7 @@ function PP:OnDialogUpdate(event, optionCount)
 			color = Defines.TextColor.NPCText})
 	end
 
-	-- if its the first time talking, dont delay the npcs text.
+	-- if the npc just started talking, dont delay the npcs text.
 	local delay = Defines.Timeout.NPCAfterResponse
 	if #self.dialog <= 1 or Defines.Flags.DisplayPlayerText == false then
 		delay = 0
@@ -121,9 +121,27 @@ function PP:HandleChatterOptionClicked(label)
 				color = Defines.TextColor.PlayerResponse,
 				from_player = true})
 		end
-	elseif label.optionIndex and type(label.optionIndex) == "function" then
-		d("clicked ")
 
+		SetDialogText(self:formatConversation())
+	elseif label.optionIndex and type(label.optionIndex) == "function" then
+		
+		local playerName = GetUnitName("player")
+		local chosenBefore = label.chosenBefore or false
+
+		if chosenBefore then
+			self:addResponse(Response:new{
+				person = playerName, text = label:GetText(),
+				color = Defines.TextColor.PlayerDuplicateResponse,
+				is_duplicate = true,
+				from_player = true})
+		else
+			self:addResponse(Response:new{
+				person = playerName, text = label:GetText(),
+				color = Defines.TextColor.PlayerResponse,
+				from_player = true})
+		end
+
+		SetDialogText(self:formatConversation())
 	end
 end
 
@@ -131,7 +149,13 @@ end
 local ihcoc = INTERACTION.HandleChatterOptionClicked
 function INTERACTION:HandleChatterOptionClicked(label)
 	-- call base handler
-	ihcoc(INTERACTION, label)
+	if Defines.Flags.DelayedNPCResponse and type(label.optionType) == "number" and label.optionType == 10000 then
+		setTimeout(function ()
+			ihcoc(INTERACTION, label)
+		end, Defines.Timeout.NPCAfterResponse)
+	else
+		ihcoc(INTERACTION, label)
+	end
 
 	-- call ParlezPlus handler
 	if label.enabled then

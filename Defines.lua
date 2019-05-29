@@ -45,6 +45,7 @@ Defines.Flags = {
 	NewlineAfterPlayerText = false,
 	NewlineAfterNPCText = false,
 	DisplayDialogTitle = false,
+	DelayedNPCResponse = false
 }
 
 function Defines:Initialize()
@@ -201,6 +202,13 @@ function Defines:CreateOptionsData()
 			tooltip = "Display the dialog title?",
 			getFunc = function () return Defines.Flags.DisplayDialogTitle end,
 			setFunc = function (v) Defines.Flags.DisplayDialogTitle = v end
+		},
+		{
+			type = "checkbox",
+			name = "Delayed NPC Response",
+			tooltip = "Delay the NPCs response?\nWarning: Experimental!",
+			getFunc = function () return Defines.Flags.DelayedNPCResponse end,
+			setFunc = function (v) Defines.Flags.DelayedNPCResponse = v end
 		}
 	}
 end
