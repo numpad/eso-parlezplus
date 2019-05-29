@@ -51,10 +51,6 @@ Defines.Flags = {
 function Defines:Initialize()
 	self.savedVars = ZO_SavedVars:NewAccountWide("ParlezPlusSavedVariables", 1, nil, {})
 
-	self.savedVars.Timeout = nil
-	self.savedVars.TextColor = nil
-	self.savedVars.Flags = nil
-
 	-- Save Variables that are not yet saved.
 	self.savedVars.Timeout = self.savedVars.Timeout or self.Timeout
 	self.savedVars.TextColor = self.savedVars.TextColor or self.TextColor
