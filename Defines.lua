@@ -43,7 +43,8 @@ Defines.Flags = {
 	PlayerNameOwnLine = false,
 	NPCNameOwnLine = false,
 	NewlineAfterPlayerText = false,
-	NewlineAfterNPCText = false
+	NewlineAfterNPCText = false,
+	DisplayDialogTitle = false,
 }
 
 function Defines:Initialize()
@@ -193,6 +194,13 @@ function Defines:CreateOptionsData()
 			tooltip = "Show the players response?",
 			getFunc = function () return Defines.Flags.DisplayPlayerText end,
 			setFunc = function (v) Defines.Flags.DisplayPlayerText = v end
+		},
+		{
+			type = "checkbox",
+			name = "Show dialog title",
+			tooltip = "Display the dialog title?",
+			getFunc = function () return Defines.Flags.DisplayDialogTitle end,
+			setFunc = function (v) Defines.Flags.DisplayDialogTitle = v end
 		}
 	}
 end

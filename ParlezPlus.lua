@@ -38,7 +38,7 @@ end
 
 -- NPC begins talking.
 function PP:OnDialogBegin(event, optionsCount)
-	SetDialogTitleHidden(true)
+	SetDialogTitleHidden(not Defines.Flags.DisplayDialogTitle)
 	self:clearConversation()
 end
 
