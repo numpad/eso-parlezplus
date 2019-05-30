@@ -33,7 +33,7 @@ Defines.TextColor = {
 
 Defines.Timeout = {
 	-- Delay until NPC dialog appears after the player responded.
-	NPCAfterResponse = 700
+	NPCAfterResponse = 600
 }
 
 Defines.Flags = {
@@ -111,6 +111,10 @@ end
 function Defines:CreateOptionsData()
 	return {
 		{
+			type = "header",
+			name = "General Settings"
+		},
+		{
 			type = "slider",
 			name = "Response Delay",
 			min = 0,
@@ -122,7 +126,10 @@ function Defines:CreateOptionsData()
 			setFunc = function (v) Defines.Timeout.NPCAfterResponse = v end,
 			clampInput = false
 		},
-		-- colors
+		{
+			type = "header",
+			name = "Colors",
+		},
 		{
 			type = "colorpicker",
 			name = "Player Response",
@@ -146,7 +153,8 @@ function Defines:CreateOptionsData()
 					Defines.TextColor.NPCText[3] / 255
 			end,
 			setFunc = function (r, g, b) Defines.TextColor.NPCText = FloatColor(r, g, b) end
-		},{
+		},
+		{
 			type = "colorpicker",
 			name = "Player Response (duplicate)",
 			tooltip = "Color of the players response if he already gave it before.",
@@ -170,7 +178,10 @@ function Defines:CreateOptionsData()
 			end,
 			setFunc = function (r, g, b) Defines.TextColor.NPCDuplicateText = FloatColor(r, g, b) end
 		},
-		-- flags
+		{
+			type = "header",
+			name = "Flags",
+		},
 		{
 			type = "checkbox",
 			name = "Display Player name",
@@ -250,6 +261,18 @@ function Defines:CreateOptionsData()
 			setFunc = function (v) Defines.Flags.DelayedNPCResponse = v end
 		},
 		{
+			type = "checkbox",
+			name = "Show response option hotkey",
+			tooltip = "Show the numeric hotkey in front of the response text.\n"
+				.. "Default: off",
+			getFunc = function () return Defines.Flags.InsertResponseOptionIndex end,
+			setFunc = function (v) Defines.Flags.InsertResponseOptionIndex = v end
+		},
+		{
+			type = "header",
+			name = "Format Strings"
+		},
+		{
 			type = "editbox",
 			name = "Player name format string",
 			tooltip = "How the players name should be formatted in the conversation.\n"
@@ -268,14 +291,6 @@ function Defines:CreateOptionsData()
 			isMultiline = false,
 			getFunc = function () return Defines.FormatString.NPCNameFormat end,
 			setFunc = function (v) Defines.FormatString.NPCNameFormat = v end
-		},
-		{
-			type = "checkbox",
-			name = "Show response option hotkey",
-			tooltip = "Show the numeric hotkey in front of the response text.\n"
-				.. "Default: off",
-			getFunc = function () return Defines.Flags.InsertResponseOptionIndex end,
-			setFunc = function (v) Defines.Flags.InsertResponseOptionIndex = v end
 		}
 	}
 end
