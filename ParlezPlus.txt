@@ -1,5 +1,5 @@
 ## APIVersion: 100031 100032
-## AddOnVersion: 1.2
+## AddOnVersion: 1.3
 ## SavedVariables: ParlezPlusSavedVariables
 ## Title: ParlezPlus
 ## Description: Improved Dialog UI.
