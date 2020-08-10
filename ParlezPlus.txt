@@ -1,4 +1,4 @@
-## APIVersion: 100027 100028
+## APIVersion: 100031 100032
 ## AddOnVersion: 1.2
 ## SavedVariables: ParlezPlusSavedVariables
 ## Title: ParlezPlus
